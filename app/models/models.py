@@ -16,7 +16,15 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    
+    # 🔹 Новые поля для мастер-аккаунта
+    is_master = Column(Boolean, default=False)  # Флаг мастер-аккаунта
+    master_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Ссылка на мастера
+    
+    # 🔹 Отношения
     students = relationship("Student", back_populates="owner", cascade="all, delete-orphan")
+    # Подчинённые аккаунты (если это мастер)
+    subordinates = relationship("User", backref="master", remote_side=[id])
 
 class Student(Base):
     __tablename__ = "students"

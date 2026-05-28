@@ -26,6 +26,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+def get_current_user_with_scope(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> dict:
+    user = get_current_user(token, db)  # существующая функция
+    return {
+        "user": user,
+        "is_master": user.is_master,
+        "accessible_user_ids": [user.id] + [u.id for u in user.subordinates] if user.is_master else [user.id]
+    }
+
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

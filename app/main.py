@@ -6,6 +6,9 @@ import os
 
 from app.core.database import init_db
 from app.routers import auth, students, lessons, stats
+from app.routers import master_stats
+
+app.include_router(master_stats.router)
 
 app = FastAPI(
     title="Tutor Scheduler API",
