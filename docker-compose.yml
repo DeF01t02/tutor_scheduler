@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tutor_scheduler
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/tutor_scheduler.db
+      - ENVIRONMENT=production
+    volumes:
+      - ./data:/app/data
+      - ./tutor_scheduler.db:/app/tutor_scheduler.db:ro
+    networks:
+      - tutor_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Сеть
+networks:
+  tutor_network:
+    driver: bridge
